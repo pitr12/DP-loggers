@@ -8,6 +8,7 @@ var Logger = (function (){
     var hasProp = topics.hasOwnProperty;
 
     return {
+        //logger initialization
         init: function() {
             var rootElement = document.documentElement;
             rootElement.addEventListener('click', this.clickListener.bind(this));
@@ -18,6 +19,7 @@ var Logger = (function (){
             //   console.log('SCROLL BODY');
             // });
         },
+        // gets unique path to element - nearest id or complete xpath
         getPathTo: function(element) {
             if (element.id!=='')
                 return "//*[@id='"+element.id+"']";
@@ -37,6 +39,7 @@ var Logger = (function (){
                 }
             }
         },
+        // extracts relevant information from captured event
         processEvent: function (event) {
             var newEvent;
 
@@ -108,6 +111,7 @@ var Logger = (function (){
             var event = this.processEvent(e);
             this.publish('scroll', event);
         },
+        // ability to subsribe to logger
         subscribe: function(topic, topicCallback) {
           if(!hasProp.call(topics, topic)) topics[topic] = [];
 
@@ -119,6 +123,7 @@ var Logger = (function (){
             }
           };
         },
+        // ability to publish processed events
         publish: function(topic, content) {
           if(!hasProp.call(topics, topic)) return;
 
