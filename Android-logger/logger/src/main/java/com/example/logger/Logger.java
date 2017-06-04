@@ -38,7 +38,13 @@ public abstract class Logger {
         }
     }
 
-    public static void start(String deviceUuid, Boolean send) {
+    // logger initialization params(
+    //  deviceUuid - unique device identifier
+    //  send - boolean whether events should be send to remote API (keen.io)
+    //  keenProjectID - ID of keen.io project
+    //  keenWriteKey - keen project write key
+    // )
+    public static void start(String deviceUuid, Boolean send, String keenProjectID, String keenWriteKey) {
         try {
             Application applicationContext = getApplicationContext();
             applicationContext.registerActivityLifecycleCallbacks(myCallback);
@@ -48,11 +54,7 @@ public abstract class Logger {
 
             if (send) {
                 client = new AndroidKeenClientBuilder(applicationContext).build();
-                KeenProject project = new KeenProject(
-                        "58f6297895cfc9addc247414",
-                        "4AA94B8D6249A0102285093AE900C15C06C261E34B641E0D27376E3FA9EE127E4E004C6FB2871D42C670FC0F19E0EF4576D8D6C77ADC1DB0230F991E7E46244454CF59C71039FAB1FB10CEC1EB0E4004826A33AA22E084A4A4F7E218A39E0F61",
-                        null
-                );
+                KeenProject project = new KeenProject(keenProjectID, keenWriteKey, null);
                 client.setDefaultProject(project);
             }
 
@@ -67,6 +69,7 @@ public abstract class Logger {
         }
     }
 
+    // ability to automatically detect application context - used to get current running Activity
     private static Application getApplicationContext() throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         Context context;
         final Class<?> activityThreadClass =

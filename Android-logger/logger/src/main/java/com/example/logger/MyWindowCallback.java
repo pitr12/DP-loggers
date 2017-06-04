@@ -44,6 +44,7 @@ public class MyWindowCallback implements Window.Callback{
     String screen;
     int lastEventType;
 
+    // windows callback initialization
     public MyWindowCallback(Window.Callback localCallback, Activity context) {
         this.localCallback = localCallback;
         this.context = context;
@@ -64,49 +65,49 @@ public class MyWindowCallback implements Window.Callback{
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
+        // tracks touch and scroll events
         if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE) {
-//            Log.d("logger", event.toString());
+            //Log.d("logger", event.toString()); - used to debugging
 
             this.lastEventType = event.getAction();
 
+            // detection of scroll event
             if (this.lastEventType == MotionEvent.ACTION_MOVE) {
                 if (Logger.scrollEvent == null) {
                     Logger.scrollEvent = new MyClickEvent("Scroll", "Unknown", Logger.lastClick.getX(), Logger.lastClick.getY(), Logger.lastClick.getAbsX(), Logger.lastClick.getAbsY(), Logger.lastClick.getEventScreen(), Logger.lastClick.getTimestamp());
                 }
             }
 
+            // find current view
             View view = context.findViewById(android.R.id.content);
 
+            //get event coordinates
             int[] screenLocation = new int[2];
             view.getLocationOnScreen(screenLocation);
-
             Float x = event.getRawX() - screenLocation[0];
             Float y = event.getRawY() - screenLocation[1];
-
             TimeZone tz = TimeZone.getTimeZone("UTC");
             final DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
             df.setTimeZone(tz);
             this.ts = df.format(new Date());
-
             this.screen = context.getClass().getSimpleName();
             this.x = Math.round(x);
             this.y = Math.round(y);
             this.absX = Math.round(event.getRawX());
             this.absY = Math.round(event.getRawY());
 
+            // detect clicked element
             View target = getClickedView(view, Math.round(x), Math.round(y));
 
              //no specific target detected
             if (target == null) {
                 Logger.lastClick = new MyClickEvent("Raw", "Unknown", this.x + this.offsetX, this.y + this.offsetY, this.absX, this.absY, this.screen, this.ts);
-//                Log.d("logger", Logger.lastClick.stringify());
             }else {
 //                Log.d("logger", Logger.lastClick.stringify());
             }
+        // send click event to remote API
         }else if (event.getAction() == MotionEvent.ACTION_UP) {
             if (this.lastEventType == MotionEvent.ACTION_DOWN) {
-                //Logger.stack.put(Logger.lastClick.stringify());
-//                Log.d("logger", Logger.lastClick.stringify());
                 if(Logger.sendToApi) {
                     Map<String, Object> currentLog = new HashMap<String, Object>();
                     currentLog.put("type", Logger.lastClick.getType());
@@ -124,10 +125,9 @@ public class MyWindowCallback implements Window.Callback{
                     currentLog.put("uuid", Logger.uuid);
                     Logger.client.addEvent(Logger.uuid, currentLog);
                 }
+            // send scroll event to remote API
             }else if (this.lastEventType == MotionEvent.ACTION_MOVE && Logger.scrollEvent != null) {
                 Logger.scrollEvent.setScrollCoordinates(Logger.lastClick.getX(), Logger.lastClick.getY(), Logger.lastClick.getAbsX(), Logger.lastClick.getAbsY());
-                //Logger.stack.put(Logger.scrollEvent.stringify());
-//                Log.d("logger", Logger.scrollEvent.stringify());
                 if(Logger.sendToApi) {
                     Map<String, Object> currentLog = new HashMap<String, Object>();
                     currentLog.put("type", Logger.scrollEvent.getType());
@@ -149,13 +149,13 @@ public class MyWindowCallback implements Window.Callback{
             }
 
             Logger.lastClick = null;
-//            Log.d("logger", Logger.stack.toString());
 
         }
 
         return localCallback.dispatchTouchEvent(event);
     }
 
+    // recursively detect clicked element
     private View getClickedView(View view, int x, int y) {
         View target = null;
 
@@ -188,14 +188,6 @@ public class MyWindowCallback implements Window.Callback{
                             target = _child;
                             Logger.lastClick = new MyClickEvent("RadioButton", "" + (((android.widget.TextView)target).getText()), this.x + this.offsetX, this.y + this.offsetY, this.absX, this.absY, context.getClass().getSimpleName(), this.ts);
                             break;
-//                        case "AppCompatImageView":
-//                            target = _child;
-//                            String label = "";
-//                            try {
-//                                label = this.context.getResources().getResourceName(((android.widget.ImageView)target).getId());
-//                            }catch(Resources.NotFoundException e){}
-//                            Logger.lastClick = new MyClickEvent("ImageView", label, this.x + this.offsetX, this.y + this.offsetY, this.absX, this.absY, context.getClass().getSimpleName(), this.ts);
-//                            break;
                         default:
                             if (_child instanceof android.view.ViewGroup) {
                                 target = getClickedView(_child, x - _bounds.left, y - _bounds.top);

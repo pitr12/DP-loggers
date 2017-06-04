@@ -7,6 +7,7 @@ import android.util.Log;
 
 /**
  * Created by peter on 5.10.2016.
+ * used to detect current running Activity
  */
 
 public class MyActivityLifeCycleCallbacks implements Application.ActivityLifecycleCallbacks {

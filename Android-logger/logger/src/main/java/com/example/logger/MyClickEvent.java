@@ -5,6 +5,7 @@ import java.util.Date;
 
 /**
  * Created by peter on 12.10.2016.
+ * representation of Event send to remote API
  */
 
 public class MyClickEvent {
