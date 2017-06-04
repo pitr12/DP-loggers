@@ -16,10 +16,10 @@ Logger.subscribe(’click’, function(e){ console.log(e);
 
 
 ### Native Android applications logger
-- Logger in `/Android-logger` can be used for logging events from native Android mobile applications, and logger automatically send captured events to remote API.
+- Logger in `/Android-logger` can be used for logging events from native Android mobile applications, and logger automatically sends captured events to remote API.
 
 ###### Usage
-1. Add file `logger.aar` found in `/Android-logger/logger/build/outputs/aar` as new module to your project Example using Android Studio: (1) File -> New -> New Module, (2) Import .JAR/.AAR package, (3) choose file `logger.aar` and type name `logger`.
+1. Add file `logger-release.aar` found in `/Android-logger/logger/build/outputs/aar` as new module to your project Example using Android Studio: (1) File -> New -> New Module, (2) Import .JAR/.AAR package, (3) choose file `logger-release.aar` and type name `logger`.
 2. In your project `settings.gradle` file add line: `include ’:logger’`.
 3. In your project `build.gradle` file in section `dependencies` add line `compile
 project(’:logger’)`.
